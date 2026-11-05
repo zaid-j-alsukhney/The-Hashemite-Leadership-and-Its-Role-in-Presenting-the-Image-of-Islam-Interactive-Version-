@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الكتاب التفاعلي | القيادة الهاشمية</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Amiri:wght@400;700&display=swap');
+:root{--green:#506c4c;--gold:#b38b48;--paper:#fffdf5;--ink:#39392f}
+*{box-sizing:border-box}
+body{margin:0;font-family:Cairo,sans-serif;color:var(--ink);background:radial-gradient(ellipse at center,#967453,#4b3425);min-height:100vh}
+button{font:inherit;cursor:pointer}
+header{height:58px;background:#282b25;color:white;display:flex;align-items:center;justify-content:space-between;padding:0 22px}
+header small{color:#d8d0c0}
+header button{background:#ffffff16;color:white;border:1px solid #ffffff44;border-radius:8px;padding:7px 12px}
+.stage{min-height:calc(100vh - 58px);display:flex;align-items:center;justify-content:center;padding:25px 12px}
+.book-area{width:min(1120px,98vw)}
+.book{height:min(720px,79vh);min-height:570px;display:grid;grid-template-columns:1fr 1fr;position:relative;perspective:1800px;filter:drop-shadow(0 25px 25px #1b100b99)}
+.page{background:var(--paper);position:relative;overflow:hidden;padding:28px 34px 44px;min-width:0}
+.page.left{border-radius:5px 0 0 5px;background:linear-gradient(90deg,#eee6d2,#fffdf5 10%)}
+.page.right{border-radius:0 5px 5px 0;background:linear-gradient(270deg,#eee6d2,#fffdf5 10%)}
+.page:after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 31px,#b6a47c0a 32px)}
+.content{position:relative;z-index:1;height:100%;overflow:auto;padding-bottom:10px}
+.content::-webkit-scrollbar{width:4px}.content::-webkit-scrollbar-thumb{background:#d4c9b2}
+.spine{position:absolute;z-index:5;top:0;bottom:0;left:50%;width:20px;transform:translateX(-50%);background:linear-gradient(90deg,#66503855,#fff7df99,#5a432c44);pointer-events:none}
+.num{position:absolute;z-index:2;bottom:12px;color:#91866f;font-size:12px}
+.left .num{left:25px}.right .num{right:25px}
+.kicker{font-size:11px;color:var(--green);font-weight:800}
+h1{font-size:26px;line-height:1.7;color:#455a3d;margin:12px 0}
+h2{font-size:19px;color:#4e6245;margin:8px 0}
+h3{font-size:14px;color:#6d5835;margin:5px 0}
+p{font-size:13px;line-height:2;margin:7px 0}
+.rule{height:2px;width:55px;background:var(--gold);margin:12px 0}
+.panel{background:#f4f0e4;border:1px solid #e3dac5;border-radius:10px;padding:12px;margin:10px 0}
+.panel.dark{background:#e9eddf;border-color:#d6dfcb}
+.small{font-size:11px;color:#77715f}
+.btn{background:var(--green);border:0;color:white;border-radius:7px;padding:8px 12px;font-size:12px}
+.btn.alt{background:#e7e1d2;color:#514b3c}
+.btn:disabled{opacity:.4}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{font-size:10px;border-radius:20px;padding:4px 9px;background:#e5eadc;color:#526b4b}
+.verse{font-family:Amiri,serif;font-size:19px;line-height:2.1;text-align:center;background:#f3f0e5;border:1px solid #e1d8c4;border-radius:9px;padding:13px;margin:10px 0}
+.verse small{display:block;font:11px Cairo;color:#94763e}
+/* interactive principle wheel */
+.wheel{height:260px;position:relative;margin:8px auto;max-width:390px;border-radius:50%;background:radial-gradient(circle,#fffdf5 0 20%,#e9eadc 21% 22%,transparent 23%);border:1px dashed #b5b99f}
+.wheel:before,.wheel:after{content:"";position:absolute;background:#c7cdb8;top:50%;left:12%;right:12%;height:1px;transform:rotate(30deg)}
+.wheel:after{transform:rotate(-30deg)}
+.orbit{position:absolute;width:67px;height:67px;border-radius:50%;border:2px solid #9aa887;background:#fffdf5;display:flex;align-items:center;justify-content:center;text-align:center;font-size:10px;font-weight:700;color:#4f6448;padding:5px;cursor:grab;user-select:none;touch-action:none;box-shadow:0 3px 8px #5b604322;transition:background .2s,transform .2s}
+.orbit:active{cursor:grabbing}
+.orbit.active{background:#526c4c;color:white;border-color:#526c4c;transform:scale(1.12);box-shadow:0 0 0 6px #526c4c22}
+.orbit:nth-child(1){top:3%;left:calc(50% - 33px)}
+.orbit:nth-child(2){top:29%;right:4%}
+.orbit:nth-child(3){bottom:5%;right:18%}
+.orbit:nth-child(4){bottom:5%;left:18%}
+.orbit:nth-child(5){top:29%;left:4%}
+.center-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;text-align:center;color:#59634c;font-weight:800;width:90px}
+.activity-output{min-height:88px;background:#fffdf7;border:1px solid #e1dac8;border-radius:8px;padding:10px}
+.activity-output strong{color:var(--green);font-size:13px}
+.activity-output p{font-size:12px}
+.slider{width:100%;accent-color:var(--green);cursor:pointer}
+.range-value{font-size:24px;color:var(--green);font-weight:800}
+.bar{height:12px;background:#e4dfd1;border-radius:20px;overflow:hidden;margin:10px 0}
+.bar span{height:100%;width:20%;display:block;background:linear-gradient(90deg,#80996b,#b7a05c);transition:width .25s}
+/* timeline: keep the visual scale and slider in the same left-to-right coordinate system */
+.timeline-track{direction:ltr;height:8px;background:#e3ddce;border-radius:10px;position:relative;margin:22px 8px}
+.timeline-fill{height:100%;width:0;background:#7b9065;border-radius:10px;transition:width .3s}
+.timeline-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:3px solid #8d9b79;cursor:pointer}
+.timeline-dot.active{background:#506c4c;border-color:#506c4c;box-shadow:0 0 0 5px #506c4c25}
+.timeline-years{direction:ltr;display:flex;flex-direction:row;justify-content:space-between;font-size:10px;color:#777}#yearSlider{direction:ltr;display:block;unicode-bidi:isolate}.timeline-dot{direction:ltr}
+/* drag and drop */
+.drag-item{padding:9px;background:#fffdf8;border:1px solid #d9d0bd;border-radius:7px;margin:6px 0;font-size:12px;cursor:grab;touch-action:none}
+.dropzone{border:1px dashed #a9a38e;background:#f8f5eb;padding:10px;border-radius:7px;min-height:42px;font-size:11px;margin:6px 0}
+.dropzone.over{background:#e8efdf;border-color:var(--green)}
+.dropzone.done{background:#e7efe3;border:1px solid #8da17d}
+.activity-card{background:#fffdf7;border:1px solid #e1dac8;border-radius:9px;padding:11px;margin:9px 0}
+.activity-card .row{margin-top:8px}
+.choice-btn{background:#eee9dc;color:#4d4a3d;border:1px solid #d8cfbb;border-radius:7px;padding:8px 10px;font:inherit;font-size:12px}
+.choice-btn:focus,.choice-btn:hover{outline:2px solid #9baa8b}
+.choice-btn.correct{background:#e2efdc;border-color:#7f9c70;color:#315b35}
+.choice-btn.wrong{background:#f5e5e0;border-color:#c88b7e;color:#914c40}
+.feedback{font-size:12px;font-weight:700;min-height:22px;margin-top:7px}
+.progress-line{height:7px;background:#e8e3d7;border-radius:9px;overflow:hidden;margin:8px 0}
+.progress-line span{display:block;height:100%;width:0;background:#82966f;transition:width .25s}
+.flip{position:absolute;z-index:8;left:0;right:auto;top:0;width:50%;height:100%;transform-origin:right center;transform-style:preserve-3d;display:none;pointer-events:none}
+.flip.go{display:block;animation:pageTurn .85s ease-in-out forwards}
+.flip.reverse{left:auto;right:0;transform-origin:left center}
+.flip.reverse.go{display:block;animation:pageTurnReverse .85s ease-in-out forwards}
+.flip .face{position:absolute;inset:0;background:linear-gradient(270deg,#e8dfca,#fffdf5 12%);backface-visibility:hidden;border:1px solid #e5dcc8}
+.flip .back{transform:rotateY(180deg);background:linear-gradient(90deg,#e8dfca,#fffdf5 12%)}
+@keyframes pageTurn{0%{transform:rotateY(0)}45%{box-shadow:20px 5px 30px #26190f66}100%{transform:rotateY(180deg)}}
+@keyframes pageTurnReverse{0%{transform:rotateY(0)}45%{box-shadow:-20px 5px 30px #26190f66}100%{transform:rotateY(-180deg)}}
+.book-nav{display:flex;justify-content:center;align-items:center;gap:16px;color:white;margin-top:17px}
+.book-nav button{background:#ffffff18;border:1px solid #ffffff55;color:white;border-radius:8px;padding:8px 15px}
+.book-nav button:disabled{opacity:.35}
+#pageStatus{font-size:12px;min-width:120px;text-align:center}
+@media(max-width:760px){
+ .book{height:auto;min-height:0;display:flex;flex-direction:column;filter:none}
+ .page{min-height:540px;border-radius:5px!important;padding:24px 22px 42px}
+ .spine,.flip{display:none!important}
+ .stage{padding:12px 7px}
+ .wheel{height:240px}
+}
+</style>
+</head>
+<body>
+<header>
+ <div><b>📖 كتابي التفاعلي</b> <small> | التربية الإسلامية – الصف العاشر</small></div>
+ <div class="row"><button onclick="speak()">🔊 قراءة</button><button onclick="stopSpeak()">إيقاف</button></div>
+</header>
+<div class="stage">
+<div class="book-area">
+<div class="book" id="book">
+ <section class="page left"><div class="content" id="left"></div><span class="num" id="lnum">٩٤</span></section>
+ <section class="page right"><div class="content" id="right"></div><span class="num" id="rnum">٩٣</span></section>
+ <div class="spine"></div>
+ <div class="flip" id="flip"><div class="face"></div><div class="face back"></div></div>
+</div>
+<div class="book-nav">
+ <button id="prev" onclick="turn(-1)">→ السابق</button>
+ <span id="pageStatus">الصفحتان ٩٣–٩٤</span>
+ <button id="next" onclick="turn(1)">التالي ←</button>
+</div>
+</div>
+</div>
+
+<script>
+const data=[
+{n:93,t:"القيادة الهاشمية ودورها في إبراز صورة الإسلام",k:"الدرس الخامس",html:`
+ <div class="kicker">الوحدة الثالثة • الدرس الخامس</div>
+ <h1>القيادة الهاشمية ودورها في إبراز صورة الإسلام</h1><div class="rule"></div>
+ <p>عملت القيادة الهاشمية بحكم مكانتها الدينية والتاريخية على توضيح صورة الإسلام والدفاع عنه في المحافل الدولية والإقليمية.</p>
+ <div class="panel dark"><h3>الفكرة الرئيسة</h3><p>إبراز حقيقة الإسلام القائمة على الرحمة والعدل والوسطية واحترام الإنسان، ومواجهة الأفكار التي تشوّه رسالته السمحة.</p></div>
+ <h2>آل البيت</h2><p>آل البيت هم أهل بيت النبي محمد ﷺ، وترتبط منزلتهم بالنسب والقرابة والإيمان برسالة الإسلام.</p>
+ <div class="panel"><h3>تأمّل</h3><p>كيف يمكن أن تساهم أنت في إبراز صورة الإسلام؟</p><textarea id="reflection" placeholder="اكتب فكرتك..." style="width:100%;height:65px;border:1px solid #d7cfbb;border-radius:7px;padding:8px;font:inherit"></textarea><button class="btn" onclick="document.getElementById('reflectionResult').textContent='إجابة جميلة! تذكّر أن السلوك الحسن من أفضل طرق التعبير عن القيم.'">اعرض تعليقًا</button><p id="reflectionResult"></p></div>
+ `},
+{n:94,t:"مؤسسة آل البيت ورسالة عمّان",k:"المؤسسات والمبادرات",html:`
+ <div class="kicker">أولًا • مؤسسة آل البيت الملكية للفكر الإسلامي</div><h2>مؤسسة آل البيت الملكية للفكر الإسلامي</h2>
+ <p>مؤسسة علمية إسلامية مستقلة تضم علماء من مختلف دول العالم الإسلامي، تأسست عام <b>١٩٨٠م</b> بتوجيه من الملك الحسين بن طلال رحمه الله.</p>
+ <div class="panel"><h3>أهداف المؤسسة</h3><p>١. التعريف بالإسلام وتصحيح المفاهيم والأفكار غير السليمة عنه.</p><p>٢. تقديم خطاب إسلامي معاصر يواكب قضايا العصر في ضوء القرآن الكريم والسنة النبوية.</p></div>
+ <h2>رسالة عمّان</h2><p>أطلقها جلالة الملك عبد الله الثاني عام <b>٢٠٠٤م</b> لتوضيح سماحة الإسلام وحقيقته ومواجهة الأفكار والممارسات الخاطئة التي شوّهت صورته. ووقّع عليها مئات العلماء المسلمين.</p>
+ <div class="panel dark"><h3>تحقّق من فهمك</h3><p>ما السنة التي تأسست فيها مؤسسة آل البيت؟</p><div class="row"><button class="btn alt" onclick="check(this,false)">١٩٩٠</button><button class="btn alt" onclick="check(this,true)">١٩٨٠</button><button class="btn alt" onclick="check(this,false)">٢٠٠٤</button></div><p class="result"></p></div>
+ `},
+{n:95,t:"مبادئ رسالة عمّان",k:"نشاط تفاعلي",html:`
+ <div class="kicker">فهم المبادئ وتطبيقها</div><h2>تأمّل المبدأ في مواقف الحياة</h2>
+ <p>اقرأ كل موقف، ثم حدّد المبدأ الذي يوجّه التصرف الصحيح. بعد الإجابة يظهر توضيح يربط الموقف بمعنى المبدأ.</p>
+ <div class="activity-card" id="principleRiddle">
+  <div class="row" style="justify-content:space-between;align-items:center"><h3>موقف للتفكير</h3><span class="pill" id="riddleCount">الموقف ١ من ٥</span></div>
+  <div class="panel dark"><b>الموقف</b><p id="riddleClue">في نقاش داخل الصف، احترم طالب زميله ولم ينتقص من كرامته بسبب اختلافه عنه.</p></div>
+  <p class="small">أي مبدأ من مبادئ رسالة عمّان يتصل بهذا الموقف؟</p>
+  <div class="row" id="riddleChoices">
+   <button class="choice-btn" onclick="answerRiddle(this,0)">تكريم الإنسان</button>
+   <button class="choice-btn" onclick="answerRiddle(this,1)">حماية الحياة</button>
+   <button class="choice-btn" onclick="answerRiddle(this,2)">الوسطية والاعتدال</button>
+   <button class="choice-btn" onclick="answerRiddle(this,3)">رفض الإرهاب</button>
+   <button class="choice-btn" onclick="answerRiddle(this,4)">بناء الحضارة</button>
+  </div>
+  <p class="feedback" id="riddleFeedback" aria-live="polite">اختر الإجابة التي تراها مناسبة.</p>
+  <div class="row" style="justify-content:space-between"><span class="small" id="riddleScore">تمت الإجابة عن ٠ من ٥ مواقف</span><button class="btn" id="riddleNext" onclick="nextRiddle()" disabled>الموقف التالي</button></div>
+  <div class="progress-line"><span id="riddleProgress"></span></div>
+ </div>
+ <div class="activity-card" id="scenarioQuiz">
+  <h3>تحدّي المواقف</h3><p id="scenarioQuestion">شاهد الموقف واختر المبدأ الذي يعبّر عنه:</p>
+  <p><b>الموقف:</b> احترام زميلك وعدم التقليل من شأنه بسبب اختلافه عنك.</p>
+  <div class="row"><button class="choice-btn" onclick="answerScenario(this,'wrong')">رفض الفساد</button><button class="choice-btn" onclick="answerScenario(this,'right')">تكريم الإنسان</button><button class="choice-btn" onclick="answerScenario(this,'wrong')">بناء الحضارة</button></div>
+  <div class="feedback" id="scenarioFeedback" aria-live="polite">اختر إجابة لتعرف السبب.</div>
+  <button class="btn alt" onclick="nextScenario()">الموقف التالي</button>
+  <div class="progress-line"><span id="scenarioProgress"></span></div><p class="small" id="scenarioCount">السؤال ١ من ٣</p>
+ </div>
+ `},
+{n:96,t:"الآيات والمبادئ",k:"اربط الدليل بالقيمة",html:`
+ <div class="kicker">تفاعل مع الأدلة الشرعية</div><h2>كل مبدأ له دليل</h2>
+ <p>اختر مبدأً من القائمة، وستظهر الآية القرآنية التي تدل عليه.</p>
+ <div class="panel">
+ <label for="verseSelect">اختر المبدأ:</label>
+ <select id="verseSelect" onchange="showVerse(this.value)" style="width:100%;padding:10px;border:1px solid #d7cfbb;border-radius:7px;margin-top:8px;font:inherit">
+  <option value="0">تكريم الإنسان</option><option value="1">المحافظة على الحياة</option><option value="2">الوسطية والاعتدال</option><option value="3">رفض الفساد</option><option value="4">الدعوة إلى الخير</option>
+ </select>
+ </div>
+ <div class="verse" id="verseBox">وَلَقَدْ كَرَّمْنَا بَنِي آدَمَ وَحَمَلْنَاهُمْ فِي الْبَرِّ وَالْبَحْرِ وَرَزَقْنَاهُمْ مِنَ الطَّيِّبَاتِ وَفَضَّلْنَاهُمْ عَلَىٰ كَثِيرٍ مِمَّنْ خَلَقْنَا تَفْضِيلًا<small>سورة الإسراء: ٧٠</small></div>
+  <div class="panel dark" id="verseAudioPanel">
+   <h3>استمع إلى تلاوة الآية</h3>
+   <p class="small">التشغيل من تسجيل MP3 محلي مرفق مع ملفات المشروع، ولا يستخدم تحويل النص إلى كلام.</p>
+   <div class="row">
+    <button class="btn" type="button" onclick="playVerseAudio()">▶ تشغيل التلاوة</button>
+    <button class="btn alt" type="button" onclick="stopVerseAudio()">■ إيقاف</button>
+   </div>
+   <audio id="verseAudio" preload="none"></audio>
+   <p id="audioStatus" class="small" aria-live="polite">ضع تسجيلات الآيات في مجلد audio حسب أسماء الملفات الموضحة في تعليمات المشروع.</p>
+  </div>
+ <div class="panel dark" id="verseChallenge"><h3>اختبر فهمك للآية</h3><p id="verseQuestion">الآية المختارة تدل على أي مبدأ؟</p>
+  <div class="row" id="verseChoices"></div>
+  <p class="feedback" id="verseFeedback" aria-live="polite">اختر المبدأ الذي يناسب الآية.</p>
+ </div>
+ <h2>الخطاب الملكي</h2><p>أكد جلالة الملك عبد الله الثاني في خطابه أمام الجمعية العامة للأمم المتحدة عام ٢٠١٦م أن البشر متساوون في الكرامة، وأن الإسلام يرفض الإكراه في الدين ويحفظ حقوق الإنسان.</p>
+ `},
+{n:97,t:"المبادرات والوصاية الهاشمية",k:"اكتشف التسلسل الزمني",html:`
+ <div class="kicker">نشاط زمني تفاعلي</div><h2>محطات ومبادرات هاشمية</h2>
+ <p>اسحب المؤشر على الخط الزمني أو اضغط على سنة لتتعرف إلى المحطة.</p>
+ <div class="panel">
+  <div class="timeline-track" id="track"><div class="timeline-fill" id="timelineFill"></div>
+   <span class="timeline-dot active" style="left:0%" onclick="setYear(0)"></span>
+   <span class="timeline-dot" style="left:25%" onclick="setYear(1)"></span>
+   <span class="timeline-dot" style="left:50%" onclick="setYear(2)"></span>
+   <span class="timeline-dot" style="left:75%" onclick="setYear(3)"></span>
+   <span class="timeline-dot" style="left:100%" onclick="setYear(4)"></span>
+  </div>
+  <input class="slider" type="range" min="0" max="4" value="0" step="1" oninput="setYear(+this.value)" id="yearSlider">
+  <div class="timeline-years"><span>١٩٨٠</span><span>٢٠٠٤</span><span>٢٠٠٦</span><span>٢٠١٠</span><span>٢٠١٨</span></div>
+ </div>
+ <div class="activity-output" id="yearOutput"><strong>١٩٨٠م</strong><p>تأسيس مؤسسة آل البيت الملكية للفكر الإسلامي بتوجيه من الملك الحسين بن طلال.</p></div>
+ <div class="activity-card"><h3>اختبر ذاكرتك الزمنية</h3><p>في أي عام أُطلقت مبادرة كلمة سواء؟</p>
+  <div class="row"><button class="choice-btn" onclick="timelineAnswer(this,false)">٢٠٠٤م</button><button class="choice-btn" onclick="timelineAnswer(this,true)">٢٠٠٦م</button><button class="choice-btn" onclick="timelineAnswer(this,false)">٢٠١٠م</button></div>
+  <p class="feedback" id="timelineFeedback" aria-live="polite">اختر السنة الصحيحة.</p>
+ </div>
+ <h2>مبادرات الحوار</h2>
+ <p><b>كلمة سواء:</b> مبادرة أطلقت عام ٢٠٠٦م، ودعت إلى الحوار والتعاون البنّاء بين المسلمين والمسيحيين على أساس المحبة المشتركة لله وللجار.</p>
+ <p><b>الوئام بين الأديان:</b> مبادرة عالمية أطلقها الملك عبد الله الثاني عام ٢٠١٠م لتعزيز العلاقات بين أتباع الأديان ونبذ العنف والتعاون لخدمة الإنسانية.</p>
+ <div class="panel dark"><h3>الوصاية الهاشمية</h3><p>تؤكد أهمية حماية المقدسات الإسلامية والمسيحية في القدس والمحافظة على هويتها الدينية والتاريخية.</p></div>
+ `},
+{n:98,t:"أراجع درسي",k:"تحدّي المراجعة",html:`
+ <div class="kicker">اختبر معلوماتك</div><h2>طابق الحديث مع المبدأ</h2>
+ <p>اسحب كل حديث إلى المبدأ المناسب له. يمكنك أيضًا النقر على الحديث ثم النقر على خانة الإجابة.</p>
+ <div class="panel">
+  <div class="drag-item" draggable="true" data-match="moderation" onclick="selectHadith(this)">١. «إن الدين يسر، ولن يشاد الدين أحد إلا غلبه، فسددوا وقاربوا وأبشروا»</div>
+  <div class="drag-item" draggable="true" data-match="equality" onclick="selectHadith(this)">٢. «لا فضل لعربي على أعجمي... إلا بالتقوى»</div>
+  <div class="drag-item" draggable="true" data-match="life" onclick="selectHadith(this)">٣. «لزوال الدنيا جميعًا أهون على الله من دم يسفك بغير حق»</div>
+ </div>
+ <div class="dropzone" data-accept="moderation" onclick="dropSelected(this)">الوسطية والاعتدال — أسقط الحديث هنا</div>
+ <div class="dropzone" data-accept="equality" onclick="dropSelected(this)">المساواة وكرامة الإنسان — أسقط الحديث هنا</div>
+ <div class="dropzone" data-accept="life" onclick="dropSelected(this)">المحافظة على حياة الإنسان — أسقط الحديث هنا</div>
+ <p id="matchFeedback" class="small" aria-live="polite">لم تبدأ المطابقة بعد.</p><div class="progress-line"><span id="matchProgress"></span></div><div class="row"><span class="small" id="matchCount">٠ من ٣ مطابقات صحيحة</span><button class="btn alt" onclick="resetMatching()">إعادة النشاط</button></div>
+ <div class="rule"></div>
+ <h2>أسئلة سريعة</h2>
+ <div class="panel"><p>المبادرة التي أطلقها الملك عبد الله الثاني عام ٢٠١٠م هي:</p>
+ <div class="row"><button class="btn alt" onclick="check(this,false)">رسالة عمّان</button><button class="btn alt" onclick="check(this,true)">الوئام بين الأديان</button></div><p class="result"></p></div>
+ <div class="panel"><p>ما تسمية اليونسكو للمسجد الأقصى؟</p>
+ <div class="row"><button class="btn alt" onclick="check(this,true)">المسجد الأقصى / الحرم الشريف</button><button class="btn alt" onclick="check(this,false)">الحرم الإبراهيمي</button></div><p class="result"></p></div>
+ `}
+];
+
+const principles=[
+ ["تكريم الإنسان","احترام كرامة الإنسان بغض النظر عن جنسه أو لونه أو دينه.","سورة الإسراء: ٧٠"],
+ ["حماية الحياة","المحافظة على النفس الإنسانية وحرمة الاعتداء عليها.","سورة المائدة: ٣٢"],
+ ["الوسطية والاعتدال","نشر التوازن والاعتدال والابتعاد عن الغلو والتطرف.","سورة البقرة: ١٤٣"],
+ ["رفض الإرهاب","رفض الإرهاب والفساد مهما كان مصدره أو هدفه.","سورة القصص: ٧٧"],
+ ["بناء الحضارة","دعوة المسلمين إلى المشاركة في بناء الحضارة الإنسانية.","سورة آل عمران: ١٠٤"]
+];
+const verseData=[
+ ["وَلَقَدْ كَرَّمْنَا بَنِي آدَمَ وَحَمَلْنَاهُمْ فِي الْبَرِّ وَالْبَحْرِ وَرَزَقْنَاهُمْ مِنَ الطَّيِّبَاتِ وَفَضَّلْنَاهُمْ عَلَىٰ كَثِيرٍ مِمَّنْ خَلَقْنَا تَفْضِيلًا","سورة الإسراء: ٧٠","isra-70.mp3"],
+ ["مَنْ قَتَلَ نَفْسًا بِغَيْرِ نَفْسٍ أَوْ فَسَادٍ فِي الْأَرْضِ فَكَأَنَّمَا قَتَلَ النَّاسَ جَمِيعًا وَمَنْ أَحْيَاهَا فَكَأَنَّمَا أَحْيَا النَّاسَ جَمِيعًا","سورة المائدة: ٣٢","maidah-32.mp3"],
+ ["وَكَذَٰلِكَ جَعَلْنَاكُمْ أُمَّةً وَسَطًا","سورة البقرة: ١٤٣","baqarah-143.mp3"],
+ ["وَلَا تَبْغِ الْفَسَادَ فِي الْأَرْضِ إِنَّ اللَّهَ لَا يُحِبُّ الْمُفْسِدِينَ","سورة القصص: ٧٧","qasas-77.mp3"],
+ ["وَلْتَكُنْ مِنْكُمْ أُمَّةٌ يَدْعُونَ إِلَى الْخَيْرِ وَيَأْمُرُونَ بِالْمَعْرُوفِ وَيَنْهَوْنَ عَنِ الْمُنْكَرِ","سورة آل عمران: ١٠٤","imran-104.mp3"]
+];
+let spread=0,busy=false,selectedHadith=null,matched=new Set();
+function ar(n){return String(n).replace(/\d/g,x=>"٠١٢٣٤٥٦٧٨٩"[x])}
+function render(){
+ const r=data[spread*2],l=data[spread*2+1];
+ document.getElementById("right").innerHTML=`<div class="kicker">${r.k}</div><h2>${r.t}</h2><div class="rule"></div>${r.html}`;
+ document.getElementById("left").innerHTML=`<div class="kicker">${l.k}</div><h2>${l.t}</h2><div class="rule"></div>${l.html}`;
+ document.getElementById("rnum").textContent=ar(r.n);
+ document.getElementById("lnum").textContent=ar(l.n);
+ document.getElementById("pageStatus").textContent=`الصفحتان ${ar(r.n)}–${ar(l.n)}`;
+ document.getElementById("prev").disabled=spread===0;
+ document.getElementById("next").disabled=spread===2;
+ if(spread===1){const r=document.getElementById("principleRiddle");if(r&&!r.dataset.ready)renderRiddle();refreshVerseChallenge();}
+ if(spread===2)initMatching();
+}
+function turn(dir){
+ if(busy)return;
+ let target=spread+dir;if(target<0||target>2)return;
+ busy=true;stopSpeak();stopVerseAudio();
+ if(innerWidth<761){spread=target;render();busy=false;return}
+ let f=document.getElementById("flip");
+ f.classList.remove("go","reverse");
+ if(dir<0)f.classList.add("reverse");
+ void f.offsetWidth;f.classList.add("go");
+ setTimeout(()=>{spread=target;render()},390);
+ setTimeout(()=>{f.classList.remove("go");busy=false},880);
+}
+function check(btn,correct){
+ let parent=btn.parentElement;
+ let res=parent.parentElement.querySelector(".result");
+ parent.querySelectorAll("button").forEach(b=>{b.classList.remove("correct","wrong");b.disabled=false;});
+ btn.classList.add(correct?"correct":"wrong");
+ if(correct){parent.querySelectorAll("button").forEach(b=>b.disabled=true);if(res)res.textContent="إجابة صحيحة! أحسنت، لقد فهمت الفكرة ✓";}
+ else if(res)res.textContent="ليست هذه الإجابة. حاول مرة أخرى وفكّر في المعلومات الواردة في الدرس.";
+}
+const scenarios=[
+ {q:"احترام زميلك وعدم التقليل من شأنه بسبب اختلافه عنك.",opts:["رفض الفساد","تكريم الإنسان","بناء الحضارة"],correct:1,why:"هذا الموقف يعبّر عن احترام كرامة الإنسان دون تمييز."},
+ {q:"المحافظة على حياة الآخرين وعدم الاعتداء عليهم.",opts:["حماية الحياة","الوسطية والاعتدال","بناء الحضارة"],correct:0,why:"حماية النفس الإنسانية من المبادئ التي تؤكدها الآية في سورة المائدة."},
+ {q:"الابتعاد عن الغلو والتطرف واختيار الاعتدال.",opts:["تكريم الإنسان","رفض الفساد","الوسطية والاعتدال"],correct:2,why:"الوسطية تعني التوازن والابتعاد عن الغلو والتقصير."}
+];
+let scenarioIndex=0,scenarioScore=0,scenarioDone=false;
+function answerScenario(btn,kind){
+ const card=document.getElementById("scenarioQuiz");if(!card||scenarioDone)return;
+ const s=scenarios[scenarioIndex],buttons=card.querySelectorAll(".choice-btn");
+ buttons.forEach(b=>b.classList.remove("correct","wrong"));
+ if(kind==="right"){
+  btn.classList.add("correct");scenarioScore++;
+  document.getElementById("scenarioFeedback").textContent="صحيح! "+s.why;
+ }else{btn.classList.add("wrong");document.getElementById("scenarioFeedback").textContent="ليست الإجابة الصحيحة. جرّب مرة أخرى.";return;}
+ scenarioDone=true;buttons.forEach(b=>b.disabled=true);
+ document.getElementById("scenarioProgress").style.width=(scenarioScore/3*100)+"%";
+}
+function nextScenario(){
+ if(scenarioIndex===scenarios.length-1){scenarioIndex=0;scenarioScore=0;const progress=document.getElementById("scenarioProgress");if(progress)progress.style.width="0%";}
+ else scenarioIndex++;
+ scenarioDone=false;
+ const s=scenarios[scenarioIndex],card=document.getElementById("scenarioQuiz");if(!card)return;
+ card.querySelector("#scenarioQuestion").textContent="شاهد الموقف واختر المبدأ الذي يعبّر عنه:";
+ card.querySelector("#scenarioQuestion").nextElementSibling.innerHTML="<b>الموقف:</b> "+s.q;
+ const row=card.querySelector(".row");row.innerHTML=s.opts.map((o,i)=>`<button class="choice-btn" onclick="answerScenario(this,${i===s.correct?"'right'":"'wrong'"})">${o}</button>`).join("");
+ card.querySelector("#scenarioFeedback").textContent="اختر إجابة لتعرف السبب.";
+ card.querySelector("#scenarioCount").textContent=`السؤال ${ar(scenarioIndex+1)} من ٣`;
+}
+function refreshVerseChallenge(){
+ const host=document.getElementById("verseChoices");if(!host)return;
+ const versePrinciples=["تكريم الإنسان","حماية الحياة","الوسطية والاعتدال","رفض الفساد","الدعوة إلى الخير"];
+ host.innerHTML=versePrinciples.map((name,i)=>`<button class="choice-btn" data-choice="${i}" onclick="answerVerse(this)">${name}</button>`).join("");
+ const feedback=document.getElementById("verseFeedback");if(feedback)feedback.textContent="اختر المبدأ الذي يناسب الآية.";
+}
+function answerVerse(btn){
+ const selected=Number(document.getElementById("verseSelect")?.value||0);
+ const chosen=Number(btn.dataset.choice),row=btn.parentElement;
+ row.querySelectorAll("button").forEach(b=>b.classList.remove("correct","wrong"));
+ if(chosen===selected){
+  btn.classList.add("correct");document.getElementById("verseFeedback").textContent="إجابة صحيحة! أحسنت؛ هذا هو المبدأ المرتبط بالآية المختارة.";
+ }else{
+  btn.classList.add("wrong");document.getElementById("verseFeedback").textContent="ليست الإجابة الصحيحة. راجع معنى الآية وحاول مرة أخرى.";
+ }
+}
+function timelineAnswer(btn,correct){
+ const row=btn.parentElement;row.querySelectorAll("button").forEach(b=>{b.classList.remove("correct","wrong");b.disabled=false;});
+ btn.classList.add(correct?"correct":"wrong");
+ document.getElementById("timelineFeedback").textContent=correct?"صحيح! أُطلقت كلمة سواء عام ٢٠٠٦م.":"حاول مجددًا؛ ارجع إلى المحطة المناسبة على الخط الزمني.";
+ if(correct)row.querySelectorAll("button").forEach(b=>b.disabled=true);
+}
+function moveBalance(v){
+ document.getElementById("rangeNum").textContent=v+"٪";
+ document.getElementById("balanceBar").style.width=v+"%";
+ document.getElementById("balanceText").textContent=
+ v<30?"المؤشر منخفض: تذكّر أن الاعتدال يرفض الغلو والتقصير معًا.":
+ v<70?"توازن جيد: تتكامل كرامة الإنسان وحماية الحياة والاعتدال.":
+ "المؤشر مرتفع: تذكّر أن تطبيق المبادئ يحتاج إلى توازن في المواقف.";
+}
+const principleRiddles=[
+ {clue:"في نقاش داخل الصف، احترم طالب زميله ولم ينتقص من كرامته بسبب اختلافه عنه.",answer:0,why:"يرتبط ذلك بتكريم الإنسان واحترام كرامته دون تمييز."},
+ {clue:"حرص فريق من الطلاب على سلامة زملائهم، ورفضوا أي تصرف يعرّض حياة الآخرين للخطر.",answer:1,why:"يرتبط ذلك بمبدأ حماية الحياة وصون النفس الإنسانية."},
+ {clue:"عند اختلاف وجهات النظر، ابتعد المشاركون عن الغلو والتشدد، واختاروا الحوار المتزن.",answer:2,why:"يرتبط ذلك بالوسطية والاعتدال والابتعاد عن الغلو والتطرف."},
+ {clue:"رفض أفراد المجتمع أعمال التخريب والإفساد، وشجّعوا على الإصلاح والمحافظة على الأمن.",answer:3,why:"يرتبط ذلك برفض الإرهاب والفساد والإفساد في الأرض."},
+ {clue:"شارك شباب في مبادرة علمية نافعة تسهم في خدمة مجتمعهم وتقدّمه.",answer:4,why:"يرتبط ذلك ببناء الحضارة والإسهام الإيجابي في تقدم المجتمعات."}
+];
+let riddleIndex=0,riddleScore=0,riddleAnswered=false;
+function renderRiddle(){
+ const host=document.getElementById("principleRiddle");if(host)host.dataset.ready="1";
+ const item=principleRiddles[riddleIndex];
+ const clue=document.getElementById("riddleClue");
+ if(!clue)return;
+ clue.textContent=item.clue;
+ document.getElementById("riddleCount").textContent="الموقف "+ar(riddleIndex+1)+" من ٥";
+ document.getElementById("riddleScore").textContent="تمت الإجابة عن "+ar(riddleScore)+" من ٥ مواقف";
+ document.getElementById("riddleFeedback").textContent="اختر الإجابة التي تراها مناسبة.";
+ document.getElementById("riddleProgress").style.width=(riddleIndex/5*100)+"%";
+ document.getElementById("riddleNext").disabled=true;
+ document.getElementById("riddleNext").textContent=riddleIndex===4?"عرض الملخص":"الموقف التالي";
+ document.getElementById("riddleChoices").innerHTML=["تكريم الإنسان","حماية الحياة","الوسطية والاعتدال","رفض الإرهاب","بناء الحضارة"].map((name,i)=>`<button class="choice-btn" onclick="answerRiddle(this,${i})">${name}</button>`).join("");
+ riddleAnswered=false;
+}
+function answerRiddle(btn,choice){
+ if(riddleAnswered)return;
+ const item=principleRiddles[riddleIndex];
+ const buttons=document.querySelectorAll("#riddleChoices button");
+ if(choice===item.answer){
+  riddleAnswered=true;riddleScore++;
+  btn.classList.add("correct");
+  document.getElementById("riddleFeedback").textContent="إجابة صحيحة. "+item.why;
+  buttons.forEach(b=>b.disabled=true);
+  document.getElementById("riddleScore").textContent="تمت الإجابة عن "+ar(riddleScore)+" من ٥ مواقف";
+  document.getElementById("riddleProgress").style.width=((riddleIndex+1)/5*100)+"%";
+  document.getElementById("riddleNext").disabled=false;
+ }else{
+  btn.classList.add("wrong");
+  document.getElementById("riddleFeedback").textContent="هذه ليست الإجابة المناسبة. أعد قراءة الموقف وحاول مرة أخرى.";
+ }
+}
+function nextRiddle(){
+ if(!riddleAnswered)return;
+ if(riddleIndex<4){riddleIndex++;renderRiddle();return;}
+ const host=document.getElementById("principleRiddle");
+ host.innerHTML=`<h3>ملخّص التطبيق</h3><p>أجبت إجابة صحيحة عن <b>${ar(riddleScore)} من ٥</b> مواقف.</p><p>راجع معاني المبادئ الخمسة في الصفحة، ثم أعد النشاط لتثبيت الفهم.</p><button class="btn" onclick="resetRiddles()">إعادة النشاط</button>`;
+}
+function resetRiddles(){
+ riddleIndex=0;riddleScore=0;riddleAnswered=false;
+ const host=document.getElementById("principleRiddle");
+ host.innerHTML=`<div class="row" style="justify-content:space-between;align-items:center"><h3>موقف للتفكير</h3><span class="pill" id="riddleCount"></span></div><div class="panel dark"><b>الموقف</b><p id="riddleClue"></p></div><p class="small">أي مبدأ من مبادئ رسالة عمّان يتصل بهذا الموقف؟</p><div class="row" id="riddleChoices"></div><p class="feedback" id="riddleFeedback" aria-live="polite"></p><div class="row" style="justify-content:space-between"><span class="small" id="riddleScore"></span><button class="btn" id="riddleNext" onclick="nextRiddle()" disabled>الموقف التالي</button></div><div class="progress-line"><span id="riddleProgress"></span></div>`;
+ renderRiddle();
+}
+function showVerse(i){
+ let v=verseData[+i];
+ document.getElementById("verseBox").innerHTML=v[0]+`<small>${v[1]}</small>`;
+ refreshVerseChallenge();
+ stopVerseAudio();
+ const status=document.getElementById("audioStatus");
+ if(status)status.textContent="التسجيل المطلوب: audio/"+v[2];
+}
+function playVerseAudio(){
+ const i=Number(document.getElementById("verseSelect")?.value||0);
+ const v=verseData[i];
+ const audio=document.getElementById("verseAudio");
+ const status=document.getElementById("audioStatus");
+ if(!audio||!v)return;
+ const src="audio/"+v[2];
+ if(audio.getAttribute("src")!==src){audio.src=src;audio.load();}
+ audio.play().then(()=>{
+  if(status)status.textContent="جارٍ تشغيل التلاوة: "+v[1];
+ }).catch(()=>{
+  if(status)status.textContent="تعذّر تشغيل الملف. تأكد من وجود "+src+" وأنه تسجيل MP3 صالح.";
+ });
+}
+function stopVerseAudio(){
+ const audio=document.getElementById("verseAudio");
+ if(audio){audio.pause();audio.currentTime=0;}
+ const status=document.getElementById("audioStatus");
+ if(status)status.textContent="تم إيقاف التلاوة.";
+}
+const years=[
+ ["١٩٨٠م","تأسيس مؤسسة آل البيت الملكية للفكر الإسلامي بتوجيه من الملك الحسين بن طلال."],
+ ["٢٠٠٤م","إطلاق رسالة عمّان لتوضيح حقيقة الإسلام وتصحيح المفاهيم الخاطئة."],
+ ["٢٠٠٦م","إطلاق مبادرة كلمة سواء للحوار والتعاون بين المسلمين والمسيحيين."],
+ ["٢٠١٠م","إطلاق مبادرة الوئام بين الأديان لتعزيز العلاقات بين أتباع الأديان."],
+ ["٢٠١٨م","حصول الملك عبد الله الثاني على جائزة تمبلتون للسلام."]
+];
+function setYear(i){
+ document.getElementById("yearSlider").value=i;
+ document.getElementById("timelineFill").style.width=(i*25)+"%";
+ document.querySelectorAll(".timeline-dot").forEach((d,j)=>d.classList.toggle("active",i===j));
+ document.getElementById("yearOutput").innerHTML=`<strong>${years[i][0]}</strong><p>${years[i][1]}</p>`;
+}
+function initMatching(){
+ document.querySelectorAll(".drag-item").forEach(el=>{
+  if(matched.has(el.dataset.match)){el.style.opacity=".35";el.draggable=false;el.onclick=null;}
+  if(el.dataset.ready)return;el.dataset.ready="1";
+  el.addEventListener("dragstart",e=>e.dataTransfer.setData("text/plain",el.dataset.match));
+ });
+ document.querySelectorAll(".dropzone").forEach(el=>{
+  const key=el.dataset.accept;
+  if(matched.has(key)){el.classList.add("done");el.textContent=el.textContent.split(" — ")[0]+" ✓";}
+  if(el.dataset.ready)return;el.dataset.ready="1";
+  el.addEventListener("dragover",e=>{e.preventDefault();el.classList.add("over")});
+  el.addEventListener("dragleave",()=>el.classList.remove("over"));
+  el.addEventListener("drop",e=>{
+   e.preventDefault();el.classList.remove("over");
+   placeMatch(e.dataTransfer.getData("text/plain"),el);
+  });
+ });
+}
+function selectHadith(el){
+ selectedHadith=el.dataset.match;
+ document.querySelectorAll(".drag-item").forEach(x=>x.style.outline=x===el?"2px solid #506c4c":"none");
+ document.getElementById("matchFeedback").textContent="تم اختيار الحديث. اضغط على المبدأ المناسب.";
+}
+function dropSelected(zone){if(selectedHadith)placeMatch(selectedHadith,zone)}
+function placeMatch(key,zone){
+ if(!key||matched.has(key))return;
+ if(zone.dataset.accept===key){
+  matched.add(key);zone.classList.add("done");
+  zone.textContent=zone.textContent.split(" — ")[0]+" ✓";
+  let item=document.querySelector(`.drag-item[data-match="${key}"]`);
+  if(item){item.style.opacity=".35";item.draggable=false;item.onclick=null}
+  document.getElementById("matchFeedback").textContent="صحيح! أحسنت. "+matched.size+" من ٣";
+  const progress=document.getElementById("matchProgress"),count=document.getElementById("matchCount");
+  if(progress)progress.style.width=(matched.size/3*100)+"%";
+  if(count)count.textContent=ar(matched.size)+" من ٣ مطابقات صحيحة";
+  if(matched.size===3)document.getElementById("matchFeedback").textContent="أكملت المطابقة بنجاح! ممتاز ✓";
+  selectedHadith=null;
+ }else{
+  document.getElementById("matchFeedback").textContent="ليست هذه المطابقة الصحيحة. حاول مرة أخرى.";
+ }
+}
+function resetMatching(){
+ matched.clear();selectedHadith=null;
+ render();
+}
+function speak(){
+ if(!("speechSynthesis" in window)){alert("القراءة الصوتية غير مدعومة في متصفحك");return}
+ stopSpeak();
+ let text=document.getElementById("right").innerText+" "+document.getElementById("left").innerText;
+ let u=new SpeechSynthesisUtterance(text);u.lang="ar-SA";u.rate=.88;speechSynthesis.speak(u);
+}
+function stopSpeak(){if("speechSynthesis" in window)speechSynthesis.cancel()}
+document.addEventListener("keydown",e=>{
+ if(e.key==="ArrowLeft")turn(1);
+ if(e.key==="ArrowRight")turn(-1);
+});
+render();
+</script>
+</body>
+</html>
